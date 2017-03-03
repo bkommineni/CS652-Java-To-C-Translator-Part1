@@ -6,6 +6,10 @@ import org.antlr.symtab.*;
 
 public class DefineScopesAndSymbols extends JBaseListener {
 	public Scope currentScope;
+	public static final Type JINT_TYPE = new JPrimitiveType("int");
+	public static final Type JFLOAT_TYPE = new JPrimitiveType("float");
+	public static final Type JSTRING_TYPE = new JPrimitiveType("string");
+	public static final Type JVOID_TYPE = new JPrimitiveType("void");
 
 	public DefineScopesAndSymbols(GlobalScope globals) {
 		currentScope = globals;
@@ -13,10 +17,11 @@ public class DefineScopesAndSymbols extends JBaseListener {
 
 	@Override
 	public void enterFile(JParser.FileContext ctx) {
-		currentScope.define(new JPrimitiveType("int"));
-		currentScope.define(new JPrimitiveType("float"));
-		currentScope.define(new JPrimitiveType("string"));
-		currentScope.define(new JPrimitiveType("void"));
+		currentScope.define((JPrimitiveType)JINT_TYPE);
+		currentScope.define((JPrimitiveType)JFLOAT_TYPE);
+		currentScope.define((JPrimitiveType)JSTRING_TYPE);
+		currentScope.define((JPrimitiveType)JVOID_TYPE);
+		ctx.scope = (GlobalScope) currentScope;
 	}
 
 	@Override
@@ -31,10 +36,39 @@ public class DefineScopesAndSymbols extends JBaseListener {
 		jClass.setDefNode(ctx);
 		currentScope.define(jClass);
 		currentScope = jClass;
+		ctx.scope = (JClass) currentScope;
 	}
 
 	@Override
 	public void exitClassDeclaration(JParser.ClassDeclarationContext ctx) {
+		currentScope = currentScope.getEnclosingScope();
+	}
+
+	@Override
+	public void enterMain(JParser.MainContext ctx) {
+		JMethod jMethod = new JMethod("main",ctx);
+		jMethod.setEnclosingScope(currentScope);
+		jMethod.setDefNode(ctx);
+		currentScope.define(jMethod);
+		currentScope = jMethod;
+		ctx.scope = (JMethod) currentScope;
+	}
+
+	@Override
+	public void exitMain(JParser.MainContext ctx) {
+		currentScope = currentScope.getEnclosingScope();
+	}
+
+	@Override
+	public void enterBlock(JParser.BlockContext ctx) {
+		LocalScope localScope = new LocalScope(currentScope);
+		currentScope.nest(localScope);
+		currentScope = localScope;
+		ctx.scope = (LocalScope) currentScope;
+	}
+
+	@Override
+	public void exitBlock(JParser.BlockContext ctx) {
 		currentScope = currentScope.getEnclosingScope();
 	}
 
@@ -44,22 +78,16 @@ public class DefineScopesAndSymbols extends JBaseListener {
 		jMethod.setEnclosingScope(currentScope);
 		jMethod.setDefNode(ctx);
 		currentScope.define(jMethod);
+		VariableSymbol implicitThis = new VariableSymbol("this");
+		implicitThis.setType((Type) currentScope);
 		currentScope = jMethod;
+		implicitThis.setScope(currentScope);
+		currentScope.define(implicitThis);
+		ctx.scope = (JMethod) currentScope;
 	}
 
 	@Override
 	public void exitMethodDeclaration(JParser.MethodDeclarationContext ctx) {
-		currentScope = currentScope.getEnclosingScope();
-	}
-
-	@Override
-	public void enterBlock(JParser.BlockContext ctx) {
-		LocalScope localScope = new LocalScope(currentScope);
-		currentScope = localScope;
-	}
-
-	@Override
-	public void exitBlock(JParser.BlockContext ctx) {
 		currentScope = currentScope.getEnclosingScope();
 	}
 
