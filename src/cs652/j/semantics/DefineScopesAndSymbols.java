@@ -31,6 +31,10 @@ public class DefineScopesAndSymbols extends JBaseListener {
 		JClass jClass = new JClass(ctx.name.getText(),ctx);
 		jClass.setEnclosingScope(currentScope);
 		jClass.setDefNode(ctx);
+		if(ctx.getChild(2).getText().startsWith("extends"))
+		{
+			jClass.setSuperClass(ctx.superClass.getText());
+		}
 		currentScope.define(jClass);
 		currentScope = jClass;
 		ctx.scope = (JClass) currentScope;

@@ -68,15 +68,18 @@ public class ComputeTypes extends JBaseListener {
 	}
 
 	@Override
-	public void enterFieldDeclaration(JParser.FieldDeclarationContext ctx) {
-		TypedSymbol type = (TypedSymbol)currentScope.resolve(ctx.ID().getText());
-		buf.append(ctx.ID().getText() + " is " + type.getType().getName() + "\n");
+	public void exitFieldRef(JParser.FieldRefContext ctx) {
+		JParser.ExpressionContext exp = (JParser.ExpressionContext)ctx.getChild(0);
+		JClass symbol = (JClass) exp.type;
+		TypedSymbol type = (TypedSymbol) symbol.resolveMember(ctx.ID().getText());
+		ctx.type = type.getType();
+		buf.append(ctx.getText() + " is " + type.getType().getName() + "\n");
 	}
 
 	@Override
-	public void exitFieldRef(JParser.FieldRefContext ctx) {
+	public void exitQMethodCall(JParser.QMethodCallContext ctx) {
 		JParser.ExpressionContext exp = (JParser.ExpressionContext)ctx.getChild(0);
-		ClassSymbol symbol = (ClassSymbol)exp.type;
+		JClass symbol = (JClass) exp.type;
 		TypedSymbol type = (TypedSymbol) symbol.resolveMember(ctx.ID().getText());
 		ctx.type = type.getType();
 		buf.append(ctx.getText() + " is " + type.getType().getName() + "\n");
@@ -84,9 +87,9 @@ public class ComputeTypes extends JBaseListener {
 
 	@Override
 	public void enterMethodCall(JParser.MethodCallContext ctx) {
-		Type type = (Type)currentScope.resolve(ctx.ID().getText());
-		ctx.type = type;
-		buf.append(ctx.getText() + " is " + type.getName() + "\n");
+		JMethod type = (JMethod) currentScope.resolve(ctx.ID().getText());
+		ctx.type = type.getType();
+		buf.append(ctx.getText() + " is " + type.getType().getName() + "\n");
 	}
 
 	@Override
