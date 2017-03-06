@@ -6,10 +6,7 @@ import org.antlr.symtab.*;
 
 public class DefineScopesAndSymbols extends JBaseListener {
 	public Scope currentScope;
-	public static final Type JINT_TYPE = new JPrimitiveType("int");
-	public static final Type JFLOAT_TYPE = new JPrimitiveType("float");
-	public static final Type JSTRING_TYPE = new JPrimitiveType("string");
-	public static final Type JVOID_TYPE = new JPrimitiveType("void");
+
 
 	public DefineScopesAndSymbols(GlobalScope globals) {
 		currentScope = globals;
@@ -17,10 +14,10 @@ public class DefineScopesAndSymbols extends JBaseListener {
 
 	@Override
 	public void enterFile(JParser.FileContext ctx) {
-		currentScope.define((JPrimitiveType)JINT_TYPE);
-		currentScope.define((JPrimitiveType)JFLOAT_TYPE);
-		currentScope.define((JPrimitiveType)JSTRING_TYPE);
-		currentScope.define((JPrimitiveType)JVOID_TYPE);
+		currentScope.define((JPrimitiveType)ComputeTypes.JINT_TYPE);
+		currentScope.define((JPrimitiveType)ComputeTypes.JFLOAT_TYPE);
+		currentScope.define((JPrimitiveType)ComputeTypes.JSTRING_TYPE);
+		currentScope.define((JPrimitiveType)ComputeTypes.JVOID_TYPE);
 		ctx.scope = (GlobalScope) currentScope;
 	}
 
@@ -49,6 +46,7 @@ public class DefineScopesAndSymbols extends JBaseListener {
 		JMethod jMethod = new JMethod("main",ctx);
 		jMethod.setEnclosingScope(currentScope);
 		jMethod.setDefNode(ctx);
+		jMethod.setType(ComputeTypes.JVOID_TYPE);
 		currentScope.define(jMethod);
 		currentScope = jMethod;
 		ctx.scope = (JMethod) currentScope;
@@ -77,6 +75,8 @@ public class DefineScopesAndSymbols extends JBaseListener {
 		JMethod jMethod = new JMethod(ctx.ID().getText(),ctx);
 		jMethod.setEnclosingScope(currentScope);
 		jMethod.setDefNode(ctx);
+		Type type = (Type) currentScope.resolve(ctx.getChild(0).getText());
+		jMethod.setType(type);
 		currentScope.define(jMethod);
 		VariableSymbol implicitThis = new VariableSymbol("this");
 		implicitThis.setType((Type) currentScope);
