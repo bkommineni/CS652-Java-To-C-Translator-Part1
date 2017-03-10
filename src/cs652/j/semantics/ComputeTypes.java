@@ -94,7 +94,7 @@ public class ComputeTypes extends JBaseListener {
 
 	@Override
 	public void enterCtorCall(JParser.CtorCallContext ctx) {
-		ClassSymbol type = (ClassSymbol) currentScope.resolve(ctx.ID().getText());
+		JClass type = (JClass) currentScope.resolve(ctx.ID().getText());
 		ctx.type = type;
 		buf.append(ctx.getText() + " is "+ type.getName() + "\n");
 	}

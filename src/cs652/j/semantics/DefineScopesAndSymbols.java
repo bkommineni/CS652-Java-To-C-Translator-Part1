@@ -82,7 +82,7 @@ public class DefineScopesAndSymbols extends JBaseListener {
 		Type type = (Type) currentScope.resolve(ctx.getChild(0).getText());
 		jMethod.setType(type);
 		currentScope.define(jMethod);
-		VariableSymbol implicitThis = new VariableSymbol("this");
+		JVar implicitThis = new JVar("this");
 		implicitThis.setType((Type) currentScope);
 		currentScope = jMethod;
 		implicitThis.setScope(currentScope);
@@ -117,7 +117,7 @@ public class DefineScopesAndSymbols extends JBaseListener {
 
 	@Override
 	public void enterFormalParameter(JParser.FormalParameterContext ctx) {
-		VariableSymbol param = new VariableSymbol(ctx.ID().getText());
+		JVar param = new JVar(ctx.ID().getText());
 		Type type = (Type) currentScope.resolve(ctx.jType().getText());
 		param.setType(type);
 		currentScope.define(param);
