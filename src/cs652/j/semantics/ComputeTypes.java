@@ -4,7 +4,14 @@ import cs652.j.parser.JBaseListener;
 import cs652.j.parser.JParser;
 import org.antlr.symtab.*;
 
+
+/**
+ * Class which overrides methods of BaseListener to compute types of expressions using scopes
+ * and symbols defined in DefineScopesAndSymbols class
+ * @author bhargavi
+ */
 public class ComputeTypes extends JBaseListener {
+
 	protected StringBuilder buf = new StringBuilder();
 
 	public static final Type JINT_TYPE = new JPrimitiveType("int");

@@ -4,7 +4,12 @@ import cs652.j.parser.JBaseListener;
 import cs652.j.parser.JParser;
 import org.antlr.symtab.*;
 
+/**
+ * Class which overrides methods of BaseListener and defines all scopes and symbols based on grammar
+ * @author bhargavi
+ */
 public class DefineScopesAndSymbols extends JBaseListener {
+
 	public Scope currentScope;
 
 
