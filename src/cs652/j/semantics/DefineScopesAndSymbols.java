@@ -36,6 +36,7 @@ public class DefineScopesAndSymbols extends JBaseListener {
 		JClass jClass = new JClass(ctx.name.getText(),ctx);
 		jClass.setEnclosingScope(currentScope);
 		jClass.setDefNode(ctx);
+// better to test if superClass is null
 		if(ctx.getChild(2).getText().startsWith("extends"))
 		{
 			jClass.setSuperClass(ctx.superClass.getText());
@@ -87,7 +88,7 @@ public class DefineScopesAndSymbols extends JBaseListener {
 		Type type = (Type) currentScope.resolve(ctx.getChild(0).getText());
 		jMethod.setType(type);
 		currentScope.define(jMethod);
-		JVar implicitThis = new JVar("this");
+		JVar implicitThis = new JVar("this"); // this is an argument not a variable
 		implicitThis.setType((Type) currentScope);
 		currentScope = jMethod;
 		implicitThis.setScope(currentScope);
